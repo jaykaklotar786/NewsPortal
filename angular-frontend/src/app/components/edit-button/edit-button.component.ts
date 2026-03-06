@@ -24,14 +24,35 @@ export class EditButtonComponent {
   constructor(private router: Router) {}
 
   get canEdit(): boolean {
-    if (!this.currentUser || !this.news) return false;
+    if (!this.currentUser || !this.news) {
+      return false;
+    }
 
     const currentUserId = this.currentUser._id;
-    const authorId = this.news.author?._id;
+
+    // Handle both string and object author formats
+    let authorId: string;
+    if (typeof this.news.author === 'string') {
+      authorId = this.news.author;
+    } else if (this.news.author && typeof this.news.author === 'object') {
+      authorId = this.news.author._id;
+    } else {
+      return false;
+    }
 
     // Admin can edit any news, author can edit their own news
     const isAdmin = this.currentUser.role === 'admin';
     const isAuthor = currentUserId === authorId;
+
+    // Debug logging (remove after testing)
+    console.log('Edit Button Debug:', {
+      currentUserId,
+      authorId,
+      isAdmin,
+      isAuthor,
+      canEdit: isAdmin || isAuthor,
+      newsTitle: this.news.title,
+    });
 
     return isAdmin || isAuthor;
   }

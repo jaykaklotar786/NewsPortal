@@ -56,7 +56,7 @@ import { DeleteConfirmationModalComponent } from '../../components/delete-confir
                   <td class="py-2 px-4 border-b">{{ item.title }}</td>
                   <td class="py-2 px-4 border-b">{{ item.category }}</td>
                   <td class="py-2 px-4 border-b">
-                    {{ item.author.name || 'Unknown' }}
+                    {{ getAuthorName(item) }}
                   </td>
                   <td class="py-2 px-4 border-b">
                     <button
@@ -237,9 +237,11 @@ export class AdminDashboardComponent implements OnInit {
     this.adminService.deleteUser(userId).subscribe({
       next: response => {
         if (response.success) {
-          this.news = this.news.filter(
-            item => (item.author?._id || item.author) !== userId,
-          );
+          this.news = this.news.filter(item => {
+            const authorId =
+              typeof item.author === 'string' ? item.author : item.author._id;
+            return authorId !== userId;
+          });
           this.toastr.success('All news for this user deleted');
         } else {
           this.toastr.error('Failed to delete news for this user');
@@ -250,5 +252,14 @@ export class AdminDashboardComponent implements OnInit {
         this.toastr.error('Failed to delete news for this user');
       },
     });
+  }
+
+  getAuthorName(news: any): string {
+    if (typeof news.author === 'string') {
+      return 'Unknown';
+    } else if (news.author && typeof news.author === 'object') {
+      return news.author.name || 'Unknown';
+    }
+    return 'Unknown';
   }
 }

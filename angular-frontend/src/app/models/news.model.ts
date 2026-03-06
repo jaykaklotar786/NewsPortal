@@ -4,11 +4,13 @@ export interface News {
   content: string;
   category: string;
   image: string;
-  author: {
-    _id: string;
-    name: string;
-    role: 'admin' | 'client';
-  };
+  author:
+    | {
+        _id: string;
+        name: string;
+        role: 'admin' | 'client';
+      }
+    | string; // Can be either populated object or string ID
   createdAt: string;
   updatedAt: string;
 }

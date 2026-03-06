@@ -308,7 +308,8 @@ import { ToastrService } from 'ngx-toastr';
             <div
               class="flex items-center justify-between text-sm text-gray-500">
               <app-author-badge
-                [author]="selectedNews.author"></app-author-badge>
+                *ngIf="getAuthorObject(selectedNews)"
+                [author]="getAuthorObject(selectedNews)!"></app-author-badge>
               <div>{{ formatDate(selectedNews.createdAt) }}</div>
             </div>
             <div class="prose max-w-none whitespace-pre-wrap">
@@ -543,5 +544,18 @@ export class NewsTabsComponent implements OnInit, OnDestroy {
       month: 'long',
       day: 'numeric',
     });
+  }
+
+  getAuthorObject(
+    news: News,
+  ): { _id: string; name: string; role: 'admin' | 'client' } | null {
+    if (typeof news.author === 'object' && news.author !== null) {
+      return news.author as {
+        _id: string;
+        name: string;
+        role: 'admin' | 'client';
+      };
+    }
+    return null;
   }
 }
